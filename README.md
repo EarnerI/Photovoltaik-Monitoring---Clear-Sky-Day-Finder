@@ -13,7 +13,6 @@ import polars as pl
 df = pl.read_csv("Example_Data.csv")  
   
 clearskyday_df = get_clearskydays(df, column_time="time", column_power="power")  
---------------------------------------------------------------------------------------------
 
 ## Citation
 If you use the code in terms of a publication, I would be greatfull, if you could cite the following paper:
