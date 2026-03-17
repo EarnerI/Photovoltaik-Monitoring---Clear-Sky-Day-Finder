@@ -16,7 +16,7 @@ df = pl.read_csv("Example_Data.csv")
 clearskyday_df = get_clearskydays(df, column_time="time", column_power="power")  
 
 ## Citation
-If you use the code in terms of a publication, I would be greatfull, if you could cite the following paper:
+If you use the code in terms of a publication, I would be greatfull, if you could cite the following paper:  
 E. Wittmann, C. Buerhop-Lutz, S. Bennett, V. Christlein, J. Hauch, C. J. Brabec, I. M. Peters, „PV Polaris – Automated PV system Orientation Prediction”, IEEE Photonics Journal, vol. 17, no. 3, 2025. DOI: 10.1109/JPHOT.2025.3568887
 in which the clear sky filter is published.
 
