@@ -7,12 +7,12 @@ Figure 1: The Clear Sky filter takes several days of monitoring data and returns
 
 ------------------------------------------------------------------------------------------
 ## Code Example
-from clearskydayfinder import get_clearskydays \n
-import polars as pl
-
-df = pl.read_csv("Example_Data.csv") /n
-
-clearskyday_df = get_clearskydays(df, column_time="time", column_power="power")/n
+from clearskydayfinder import get_clearskydays <br />
+import polars as pl <br />
+<br />
+df = pl.read_csv("Example_Data.csv") <br />
+<br />
+clearskyday_df = get_clearskydays(df, column_time="time", column_power="power")<br />
 --------------------------------------------------------------------------------------------
 
 ## Citation
