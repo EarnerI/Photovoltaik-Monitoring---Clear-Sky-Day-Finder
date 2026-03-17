@@ -1,0 +1,22 @@
+[project]
+name = "clearskydayfinder"
+version = "0.1.0"
+description = "A Clear Sky Day filter, that takes monitoring data of PV systems as power over time and returns only the data of clear sky days."
+readme = "README.md"
+authors = [
+    { name = "ErnstWittmann", email = "88879092+ErnstWittmann@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib>=3.10.6",
+    "numpy>=2.3.3",
+    "polars>=1.34.0",
+    "tqdm>=4.67.1",
+]
+
+[project.scripts]
+clearskydayfinder = "clearskydayfinder:main"
+
+[build-system]
+requires = ["uv_build>=0.8.22,<0.9.0"]
+build-backend = "uv_build"
