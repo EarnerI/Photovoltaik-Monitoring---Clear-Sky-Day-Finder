@@ -18,12 +18,11 @@ clearskyday_df = get_clearskydays(df, column_time="time", column_power="power")
 ## Citation
 If you use the code in terms of a publication, I would be greatfull, if you could cite the following paper:  
 E. Wittmann, C. Buerhop-Lutz, S. Bennett, V. Christlein, J. Hauch, C. J. Brabec, I. M. Peters, „PV Polaris – Automated PV system Orientation Prediction”, IEEE Photonics Journal, vol. 17, no. 3, 2025. DOI: 10.1109/JPHOT.2025.3568887
-in which the clear sky filter is published.
 
 -----------------------------------------------------------------------------------------------
 
 
-##Functionality:
+## Functionality:
 First a clear sky template is created based on the work of Ian Marius et all. [1]. The process involves finding the maximum power output for each time of day over a one-month dataset, multiplying the result by a percentile (e.g., 0.9 for Germany), and smoothing it using median and mean sliding windows.
 The clear sky filter than filters out days, that show lagging data. To filter days with lagging data, there are three checks:
 1. Check if data over a day has enough datapoints. (e.g. within a recordingspeed of 1h, there should be 24 datapoints for a day)
