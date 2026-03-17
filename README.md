@@ -2,7 +2,8 @@
 A Clear Sky Day filter, that takes monitoring data of PV systems as power over time and returns only the data of clear sky days.
 Usable for Module-, String- and Inverter data as well as for DC and AC power recordings.
 
-<img width="375" height="287" alt="ClearSkyDay-GraphicalAbstract" src="https://github.com/user-attachments/assets/0156f08b-f373-40a0-b150-21ce0f698af8" />  
+<img width="375" height="287" alt="ClearSkyDay-GraphicalAbstract" src="https://github.com/user-attachments/assets/0156f08b-f373-40a0-b150-21ce0f698af8" /><center />  
+  
 Figure 1: The Clear Sky filter takes several days of monitoring data and returns only days, classified as clear sky days.
 
 ------------------------------------------------------------------------------------------
