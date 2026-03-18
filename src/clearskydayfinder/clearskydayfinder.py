@@ -4,13 +4,13 @@ import numpy as np
 from tqdm import tqdm
 
 
-def get_clearskydays(data, column_time: str = "time", column_power: str = "power", column_id: str = "id",
-                     comparison_intervall: str = "30d", prep_smooth_kernal: int = 10, smooth_kernal: int = 60,
+def get_clearskydays(data, column_time: str = "time", column_power: str = "power", column_id = None,
+                     comparison_intervall: str = "30d", prep_smooth_kernal: int = None, smooth_kernal: int = None,
                      percentil: float = 0.9,
                      first_last_limit: float = 0.1, show_first_last_value: bool = True,
                      min_number_of_datapoints: int = None, find_numberofpoints: bool = True,
                      hole_size_threshold: int = 100, show_max_hole_size: bool = True,
-                     plot_raw_data: bool = False,
+                     plot_raw_data: bool = True,
                      corr_threshold: float = 0.98, plot_corr_results: bool = True,
                      max_dist: int = 40, n_max_exceeds: int = 50, plot_taken_results: bool = True):
     """
@@ -107,7 +107,7 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
     # If no Id-column exists, then add one
     if column_id == None:
         column_id = "default_id"
-        data = data.with_column((pl.col("power") * 0).alias("default_id"))
+        data = data.with_columns((pl.col(column_power) * 0).alias("default_id"))
     saving = data.clone()
     data = data[column_time, column_power, column_id]
 
@@ -122,19 +122,19 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                 min_number_of_datapoints = 100
             elif (frequence > 5) & ((frequence <= 10)):
                 min_number_of_datapoints = 70
-            elif (frequence > 10) & ((frequence <= 15)):
+            elif (frequence > 500) & ((frequence <= 1000)):
                 min_number_of_datapoints = 45
             else:
                 min_number_of_datapoints = 20
-            print(f"min_number_of_datapoints: {min_number_of_datapoints}")
+            print(f"Rec_time: {frequence}s -> min_number_of_datapoints: {min_number_of_datapoints}")
         if (prep_smooth_kernal == None):
             if (frequence <= 1):
                 prep_smooth_kernal = 10
-            elif (frequence > 1) & ((frequence <= 5)):
+            elif (frequence > 500) & ((frequence <= 1000)):
                 prep_smooth_kernal = 5
             else:
                 prep_smooth_kernal = 2
-            print(f"prep_smooth_kernal: {prep_smooth_kernal}")
+            print(f"Rec_time: {frequence}s -> prep_smooth_kernal: {prep_smooth_kernal}")
         if (smooth_kernal == None):
             if (frequence <= 1):
                 smooth_kernal = 60
@@ -142,23 +142,23 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                 smooth_kernal = 30
             elif (frequence > 5) & ((frequence <= 10)):
                 smooth_kernal = 15
-            elif (frequence > 10) & ((frequence <= 15)):
+            elif (frequence > 500) & ((frequence <= 1000)):
                 smooth_kernal = 10
             else:
                 smooth_kernal = 2
-            print(f"smooth_kernal: {smooth_kernal}")
+            print(f"Rec_time: {frequence}s -> smooth_kernal: {smooth_kernal}")
         if (hole_size_threshold == None):
             if (frequence <= 1):
-                hole_size_threshold = 30
-            elif (frequence > 1) & ((frequence <= 5)):
-                hole_size_threshold = 30
-            elif (frequence > 5) & ((frequence <= 10)):
-                hole_size_threshold = 50
-            elif (frequence > 10) & ((frequence <= 15)):
                 hole_size_threshold = 60
+            elif (frequence > 1) & ((frequence <= 5)):
+                hole_size_threshold = 60
+            elif (frequence > 5) & ((frequence <= 10)):
+                hole_size_threshold = 40
+            elif (frequence > 500) & ((frequence <= 1000)):
+                hole_size_threshold = 30
             else:
-                min_number_of_datapoints = 120
-            print(f"hole_size_threshold: {hole_size_threshold}")
+                min_number_of_datapoints = 30
+            print(f"Rec_time: {frequence}s -> hole_size_threshold: {hole_size_threshold}")
         if (n_max_exceeds == None):
             if (frequence <= 1):
                 n_max_exceeds = 300
@@ -166,36 +166,42 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                 n_max_exceeds = 100
             elif (frequence > 5) & ((frequence <= 10)):
                 n_max_exceeds = 70
-            elif (frequence > 10) & ((frequence <= 15)):
-                n_max_exceeds = 45
-            else:
+            elif (frequence > 500) & ((frequence <= 1000)):
                 n_max_exceeds = 20
+            else:
+                n_max_exceeds = 5
             print(f"n_max_exceeds: {n_max_exceeds}")
         if (max_dist == None):
             max_dist = np.max(module_data[column_power].to_numpy()) * 0.3
             print(f"max_dist: {max_dist}")
         if find_numberofpoints:
-            print("to remove the plot, do: find_numberofpoints = False")
-            print(f"Frequence: {get_frequence(module_data, column_time) * 60}s")
+            print("FIND MINIMAL NUMBER OF DATAPOINTS PER DAY:")
             _, counts = np.unique(module_data[column_time].dt.date(), return_counts=True)
             counts, bins = np.histogram(counts)
             counts = np.cumsum(counts)
             plt.stairs(counts[::-1], bins)
-            plt.axvline(min_number_of_datapoints, label="Min number of points threshold.")
+            plt.axvline(min_number_of_datapoints, color="red", label="Min number of points threshold.")
             plt.xlabel("number of points over one day", fontsize=20)
             plt.ylabel("number of days", fontsize=20)
             plt.tick_params(labelsize=18)
             plt.legend(fontsize=18)
             plt.show()
-            print("only days that have more points than the threshold are taken into account!")
+            print("")
+            print("Only days that have more points then the threshold are taken into account!")
+            print(f"Your recording time is estimated to {get_frequence(module_data, column_time) * 60}s")
+            print(f"Thus, the maximal amount of datapoints per day is {1440 / get_frequence(module_data, column_time)}")
+            print(f"You should put the threshold limit, so that you remove days with very low recordings, but keep the days with enough datapoints.")
+            print(f"The current default value is set to {min_number_of_datapoints}.")
+            print("(Note: to hide the plot and hint, set find_numberofpoints=False).")
+            print("---------------------------------------------------------------------------")
         # ---------------------------------------------------------------
-        for count, time_interval in enumerate(module_data.sort(column_time).group_by_dynamic(
+        for time_interval in module_data.sort(column_time).group_by_dynamic(
                 column_time,  # The column to base the dynamic window on
                 every=comparison_intervall,  # The interval of the windows
                 closed="right"  # Determines if the interval includes the right boundary
         ).agg([pl.col(column_time).alias("m_time"),
                pl.col(column_power).alias("m_power"),
-               pl.col(column_id).alias("m_id")]).iter_rows()):
+               pl.col(column_id).alias("m_id")]).iter_rows():
             month_data = pl.DataFrame({column_time: time_interval[1],
                                        column_power: time_interval[2],
                                        column_id: time_interval[3]})
@@ -205,9 +211,9 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
             cst = get_clearskytemplate(month_data, prep_smooth_kernal=prep_smooth_kernal, smooth_kernal=smooth_kernal,
                                        percentil=percentil, column_time=column_time, column_power=column_power)
 
-            for day_interval in month_data.group_by("date").agg([pl.col(column_time).alias("m_time"),
+            for count, day_interval in enumerate(month_data.group_by("date").agg([pl.col(column_time).alias("m_time"),
                                                                  pl.col(column_power).alias("m_power"),
-                                                                 pl.col(column_id).alias("m_id")]).iter_rows():
+                                                                 pl.col(column_id).alias("m_id")]).iter_rows()):
                 day_data = pl.DataFrame({column_time: day_interval[1],
                                          column_power: day_interval[2],
                                          column_id: day_interval[3]})
@@ -217,22 +223,35 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                     first_value_check = day_data[column_power].to_numpy()[0] <= first_last_limit
                     last_value_check = day_data[column_power].to_numpy()[-1] <= first_last_limit
                     if show_first_last_value:
-                        print(f"""First Value: {first_value_check} || Last Value: {last_value_check} - 
+                        print("FIND FIRST AND LAST LIMIT:")
+                        plt.plot(day_data["day_time"], day_data[column_power], label="Data")
+                        plt.axhline(first_last_limit, color="red", label="first_last_limit")
+                        plt.xlabel("day time / s", fontsize=20)
+                        plt.ylabel(column_power, fontsize=20)
+                        plt.tick_params(labelsize=18)
+                        plt.legend(fontsize=18)
+                        plt.show()
+                        print(f"First Value: {first_value_check} || Last Value: {last_value_check}")
+                        if count == 0:
+                            print(""" 
                         Both conditions must be True. If not, adjust the first_last_limit parameter accordingly (current value: {first_last_limit}).
                         
                         This check ensures that each day’s data begins and ends below the specified limit. 
                         The underlying assumption is that no power is generated during nighttime, so a 
                         complete and properly recorded day should start and end at approximately 0 W.
                         If a day does not start or end near 0 W, it typically indicates that the recording 
-                        began or stopped during daytime hours, resulting in incomplete daily data.To inspect 
-                        the first and last values of each day, enable show_first_last_value..
-                        (Note: To disable this hint, set show_first_last_value = False.)""")
+                        began or stopped during daytime hours, resulting in incomplete daily data.
+                        (Note: To disable this hint, set show_first_last_value = False).""")
+                        print("-------------------------------------------------------------------")
                     if first_value_check & last_value_check:  # Take day if starts/ends with night power generation (0W)
                         check_hole, hole_size = _bad_holes_check(day_data, hole_size_threshold=hole_size_threshold,
                                                                  column_time=column_time)
-                        if show_max_hole_size: print(
-                            f"""The hole_size_threshold ({hole_size_threshold}) must be greater than the maximum 
-                            detected gap (hole_size). Data gaps (“holes”) can occur when no measurements are recorded 
+                        if show_max_hole_size:
+                            print(f" HOLE_SIZE_THREESHOLD: {hole_size_threshold} / {hole_size}")
+                            if count==0: print("""
+                            The hole_size_threshold ({hole_size_threshold}) must be greater than the maximum 
+                            detected gap ({hole_size}).
+                            Data gaps (“holes”) can occur when no measurements are recorded 
                             for a period of time within a day. The hole_size_threshold defines the maximum allowed 
                             time (in minutes) between two consecutive data points. This limit must not be exceeded.
                             If a gap exceeds this threshold, it indicates missing data beyond the acceptable range.
@@ -240,7 +259,7 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                             To disable this validation, set hole_size_threshold to a value greater than 1440 minutes 
                             (longer than a full day).
                             If set to None, a default value is automatically selected based on the recording frequency.
-                            (Note: To hide this hint, set show_max_hole_size = False.)""")
+                            (Note: To hide this hint, set show_max_hole_size = False).""")
                         if check_hole:  # Take day if no lagging data.
                             if plot_raw_data:
                                 print("----------- PLOT RAW DATA ------------------")
@@ -254,12 +273,15 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                                 plt.show()
                                 print(f"Module ID: {module_data[column_id].to_numpy()[0]}" +
                                       f" || DAY: {day_interval[0]}")
+                                print(f"perp_smooth_kernal: {prep_smooth_kernal}")
+                                print(f"smooth_kernal: {smooth_kernal}")
                                 if count==0:
-                                    print(f"""This plot shows the comparison between the recorded power data 
-                                and the derived power template.
-                                The template is computed over the interval comparison_interval = {comparison_intervall}. 
+                                    print(f"""
+                                This plot shows the comparison between the recorded power data 
+                                and the derived power template.The template is computed over the 
+                                interval comparison_interval = {comparison_intervall}. 
                                 It is first smoothed using prep_smooth_kernel = {prep_smooth_kernal}, 
-                                followed by a second smoothing step with smooth_kernel = {smooth_kernal}.
+                                followed by a second smoothing step with smooth_kernal = {smooth_kernal}.
 
                                 Carefully evaluate the degree of smoothing:
                                 Excessive smoothing can suppress important features, potentially resulting in an 
@@ -276,8 +298,10 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
 
                                 If the template’s peak power is systematically higher or lower than the recorded data, 
                                 adjust the scaling factor percentile = {percentil}. This parameter scales the template 
-                                and can account for effects such as atmospheric attenuation (e.g., dust) as well as 
-                                smoothing-induced amplitude reduction.
+                                and can account for effects such as atmospheric attenuation (e.g., dust).
+                                Pertencile can have values between 0 to 1.
+                                1: perfect situation.
+                                0: no irradiance reaches the module due to soiling and air pollution.
 
                                 (Note: To hide this hint, set plot_raw_data = False.)""")
 
@@ -286,11 +310,15 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                                                comp_data["tmp_" + column_power].to_numpy())[0, 1]
 
                             if plot_corr_results:
-                                print("############ Correlation Results ###################")
+                                print("CORRELATION RESULT:")
                                 plt.plot(comp_data["day_time"], comp_data[column_power], color="blue",
                                          label="Real Data")
                                 plt.plot(comp_data["day_time"], comp_data["tmp_" + column_power], color="red",
                                          label="Template")
+                                plot_data = comp_data.with_columns((pl.col(column_power) - pl.col("tmp_" + column_power)).abs().alias("dif"))
+                                plot_data = plot_data.with_columns(pl.when(pl.col("dif")>max_dist).then(1).otherwise(0).alias("dif"))
+                                plot_data = plot_data.filter(pl.col("dif")==1)
+                                plt.vlines(plot_data["day_time"],plot_data[column_power], plot_data["tmp_" + column_power], color="orange", label="Violations")
                                 plt.xlabel("t/s", fontsize=20)
                                 plt.ylabel(column_power, fontsize=20)
                                 plt.tick_params(labelsize=18)
@@ -299,30 +327,34 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                                 plt.show()
                                 print(f"Module ID: {module_data[column_id].to_numpy()[0]}" +
                                       f" || DAY: {day_interval[0]}")
-                                print(f"CORRELATION: {corr}")
+                                print(f"CORRELATION: {corr_threshold}/{corr}")
+                                print(f"Max_dist: {max_dist} and n_max_exceeds: {n_max_exceeds}  -> Violations: {len(comp_data.filter((pl.col(column_power) - pl.col('tmp_' + column_power)) < -max_dist))}")
                                 if count == 0:
-                                    print(
-                                    f"""Only days with a correlation higher than corr_threshold = {corr_threshold} are considered.
+                                    print(f"""
+                                    Only days with a correlation higher than corr_threshold = {corr_threshold} are considered.
                                     The current day has a correlation of {corr}.
-                                    Additionally, a day is only accepted if the recorded power does not fall below the 
-                                    template by more than max_dist = {max_dist} for more than 
-                                    n_max_exceeds = {n_max_exceeds} data points.
+                                    
+                                    !Additionally, a day is only accepted if the recorded power does not fall below the 
+                                    template by more than max_dist = {max_dist} 
+                                    for more than n_max_exceeds = {n_max_exceeds} data points.
+                                    max_dist is in this case the power difference between template and recording.
+                                    Depending on the input data it can be a value given in W, kW or if the data is normed a value between 0 to 1.
+                                    n_max_exceeds is the number of violations, the number how of often the maximal allowed power difference is allowed.
 
                                     Number of exceedances (violations): {len(comp_data.filter((pl.col(column_power) - pl.col('tmp_' + column_power)) < -max_dist))}
 
                                     Interpretation:
-                                    An exceedance occurs when the recorded power is significantly lower than the 
-                                    template beyond the allowed tolerance. Too many exceedances indicate that the 
-                                    day deviates too strongly from the expected clear-sky profile.
+                                    An exceedance occurs when the recorded power is  lower than the 
+                                    template beyond the allowed tolerance (max_dist = {max_dist}). 
+                                    Too many exceedances (n_max_exceeds: {n_max_exceeds}) indicate 
+                                    that the day deviates too strongly from the expected clear-sky profile.
+                                    
+                                    In order do ignore e.g. soiling losses, you can reduce the pertencile. 
+                                    Pertencile can have values between 0 to 1.
+                                    1: perfect situation.
+                                    0: no irradiance reaches the module due to soiling and air pollution.
 
-                                    Important:
-                                    If percentile = {percentil} is set to 1 and the (red) template is noticeably 
-                                    lower than the measured data:
-                                    First, reduce smooth_kernel = {smooth_kernal}.
-                                    If necessary, also reduce prep_smooth_kernel = {prep_smooth_kernal}.
-                                    Excessive smoothing can artificially suppress the template amplitude, 
-                                    leading to systematic mismatches.
-                                    (Note: To hide the plot and these hints, set plot_corr_results = False.)""")
+                                    (Note: To hide the plot and these hints, set plot_corr_results = False).""")
 
                             if corr > corr_threshold:  # Take day if correlating with template
                                 if _check_distance(comp_data, max_dist=max_dist, n_max_exceeds=n_max_exceeds,
@@ -337,6 +369,7 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
                                     print(f"DATAPOINTS: {len(day_data)}")
                                     print(f"CORRELATION: {corr}")
                                     print("Hole: ", hole_size)
+                                    print(f"Violations: {len(comp_data.filter((pl.col(column_power) - pl.col('tmp_' + column_power)) < -max_dist))}")
                                     plt.figure(figsize=(4, 4))
                                     plt.plot(day_data["day_time"], day_data[column_power], color="blue",
                                              label="Real Data")
@@ -378,13 +411,16 @@ def get_clearskytemplate(id_data, column_time: str="time", column_power: str="po
     :return: a polars dataframe, including the power over time of a maximal power curve over all included days given in column "tmp_{column_power}".
     """
     cst = add_daytime(id_data,column_time=column_time).sort("day_time")
-    if prep_smooth_kernal!=None:
+    real_max_value = cst[column_power].max()
+    if prep_smooth_kernal>1:
         cst = cst.with_columns(pl.col(column_power).rolling_mean(window_size=prep_smooth_kernal, center=True))
     cst = cst.group_by("day_time").agg(pl.col(column_power).max())
-    cst = cst.with_columns(pl.col(column_power)*percentil)
     cst = cst.with_columns(pl.col(column_power).alias(f"tmp_{column_power}"))
-    if smooth_kernal!=None:
+    if smooth_kernal>1:
         cst = cst.with_columns(pl.col(column_power).rolling_mean(window_size=smooth_kernal, center=True).alias(f"tmp_{column_power}"))
+    smooth_max_value = cst[f"tmp_{column_power}"].max()
+    cst = cst.with_columns(pl.col(f"tmp_{column_power}")/smooth_max_value*real_max_value)
+    cst = cst.with_columns(pl.col(f"tmp_{column_power}") * percentil)
     return cst
 
 def add_daytime(day_data,column_time: str="time"):
@@ -436,5 +472,5 @@ def get_frequence(id_data, column_time: str="time"):
     :param column_time: the column name including the time values as [utc] in [ns]; (default: "time")
     :return: median time in minutes between two time steps.
     """
-    id_data = add_daytime(id_data, column_time=column_time).sort("day_time")
-    return np.median((id_data["day_time"].to_numpy()[1:]-id_data["day_time"].to_numpy()[:-1]))
+    id_data = add_daytime(id_data, column_time=column_time).sort(column_time)
+    return np.nanmedian((id_data["day_time"].to_numpy()[1:]-id_data["day_time"].to_numpy()[:-1]))
