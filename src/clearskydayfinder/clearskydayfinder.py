@@ -108,7 +108,7 @@ def get_clearskydays(data, column_time: str = "time", column_power: str = "power
     if column_id == None:
         column_id = "default_id"
         data = data.with_column((pl.col("power") * 0).alias("default_id"))
-    saving = data.copy()
+    saving = data.clone()
     data = data[column_time, column_power, column_id]
 
     for module_data in tqdm(data.partition_by(column_id)):
