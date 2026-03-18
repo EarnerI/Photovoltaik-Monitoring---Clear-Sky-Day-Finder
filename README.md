@@ -56,7 +56,7 @@ get_clearskydays(data,
                 corr_threshold: float = 0.98, plot_corr_results: bool = True,
                 max_dist: int = 40, n_max_exceeds: int = 50, plot_taken_results: bool = True)
 ```
-**data**: polar frame, including time and power
+<strong>data</strong>: polar frame, including time and power
 **column_time**: the column name including the time values as [utc] in [ns]; (default: "time")
 **column_power**: the column name including the power values as [float32 or flout64]; (default: "power")
 **column_id**: the column name including the ids:
