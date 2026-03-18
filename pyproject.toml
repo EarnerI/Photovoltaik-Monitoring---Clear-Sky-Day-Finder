@@ -6,10 +6,10 @@ readme = "README.md"
 authors = [
     { name = "ErnstWittmann", email = "88879092+ErnstWittmann@users.noreply.github.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.10.6",
-    "numpy>=2.3.3",
+    "numpy>=2.2.3",
     "polars>=1.34.0",
     "tqdm>=4.67.1",
 ]
