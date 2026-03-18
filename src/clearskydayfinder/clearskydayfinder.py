@@ -2,7 +2,12 @@ import polars as pl
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+from importlib import resources
 
+def load_example():
+    with resources.files("clearskydayfinder.data").joinpath("Example_Data.csv").open("rb") as f:
+        data = pl.read_csv(f)
+        return data
 
 def get_clearskydays(data, column_time: str = "time", column_power: str = "power", column_id = None,
                      comparison_intervall: str = "30d", prep_smooth_kernal: int = None, smooth_kernal: int = None,
