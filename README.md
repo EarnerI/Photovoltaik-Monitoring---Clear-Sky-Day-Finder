@@ -121,6 +121,7 @@ Euclidian Distance Comparison
 **return**: Returns a dataframe including only the filtered clear sky days, given as polars dataframe.
 
 ## Parameter Fitting:
+### MIN_NUMBER_OF_DATAPOINTS
 ```python
 from clearskydayfinder import get_clearskydays, load_example_data
 import polars as pl
@@ -148,7 +149,7 @@ Since the data is recorded over each minute (Recordingintervall: 52.99 sec), a f
 You can see in the plot, that the example data has about 200 days with only 300 datapoints per day, within about 400 points over days, the number of days is decreasing until 1000 points over a day is reached.
 With setting min_number_of_datapoints all days with less datapoints over a day are removed and only days with more then min_number_of_datapoints are used. 
 
-
+### FIRST_LAST_LIMIT
 The next parameter is the first_last_value (dafault: 0.1).
 The idea is, to remove days where the recording did not start and end at the beginnen and end of a day. 
 The value first_last_limit tells where the start and end value has to lie among.
@@ -169,7 +170,7 @@ clearskyday_df = get_clearskydays(data, column_time = "time", column_power = "po
 
 <img width="1391" height="531" alt="grafik" src="https://github.com/user-attachments/assets/6d6532c0-47c1-4b45-8f54-dbf5623ac7c9" />
 
-
+### SMOOTHING KERNALS AND PERTENCIL
 The next values that need to be adjusted are smoothing parameters prep_smooth_kernal and smooth_kernal for the template.
 
 
