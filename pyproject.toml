@@ -25,6 +25,9 @@ clearskydayfinder = "clearskydayfinder:main"
 requires = ["uv_build>=0.8.22,<0.9.0"]
 build-backend = "uv_build"
 
+[tool.setuptools.package-data]
+my_library = ["data/*.csv"]
+
 [project.urls]
 Homepage = "https://github.com/EarnerI/Photovoltaik-Monitoring---Clear-Sky-Day-Finder"
 Issues = "https://github.com/EarnerI/Photovoltaik-Monitoring---Clear-Sky-Day-Finder"
