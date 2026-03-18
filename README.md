@@ -29,15 +29,7 @@ clearskyday_df = get_clearskydays(data, column_time="time", column_power="power"
 
 ## Explanations:
 
-get_clearskydays(data, column_time: str = "time", column_power: str = "power", column_id = None,
-                     comparison_intervall: str = "30d", prep_smooth_kernal: int = None, smooth_kernal: int = None,
-                     percentil: float = 0.9,
-                     first_last_limit: float = 0.1, show_first_last_value: bool = True,
-                     min_number_of_datapoints: int = None, find_numberofpoints: bool = True,
-                     hole_size_threshold: int = 100, show_max_hole_size: bool = True,
-                     plot_raw_data: bool = True,
-                     corr_threshold: float = 0.98, plot_corr_results: bool = True,
-                     max_dist: int = 40, n_max_exceeds: int = 50, plot_taken_results: bool = True)
+get_clearskydays(data, column_time: str = "time", column_power: str = "power", column_id = None, comparison_intervall: str = "30d", prep_smooth_kernal: int = None, smooth_kernal: int = None, percentil: float = 0.9, first_last_limit: float = 0.1, show_first_last_value: bool = True, min_number_of_datapoints: int = None, find_numberofpoints: bool = True, hole_size_threshold: int = 100, show_max_hole_size: bool = True, plot_raw_data: bool = True, corr_threshold: float = 0.98, plot_corr_results: bool = True, max_dist: int = 40, n_max_exceeds: int = 50, plot_taken_results: bool = True)
 
 :param data: polar frame, including time and power
 :param column_time: the column name including the time values as [utc] in [ns]; (default: "time")
