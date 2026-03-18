@@ -27,6 +27,18 @@ clearskyday_df = get_clearskydays(data, column_time="time", column_power="power"
 # (An id is not nessecarly needed!)
 ```
 
+## Citation
+If you use the code in terms of a publication, I would be greatfull, if you could cite the following paper:  
+E. Wittmann, C. Buerhop-Lutz, S. Bennett, V. Christlein, J. Hauch, C. J. Brabec, I. M. Peters, „PV Polaris – Automated PV system Orientation Prediction”, IEEE Photonics Journal, vol. 17, no. 3, 2025. DOI: 10.1109/JPHOT.2025.3568887
+
+## Functionality:
+First a clear sky template is created based on the work of Ian Marius et all. [1]. The process involves finding the maximum power output for each time of day over a one-month dataset, multiplying the result by a percentile (e.g., 0.9 for Germany), and smoothing it using median and mean sliding windows.
+The clear sky filter than filters out days, that show lagging data. To filter days with lagging data, there are three checks:
+1. Check if data over a day has enough datapoints. (e.g. within a recordingspeed of 1h, there should be 24 datapoints for a day)
+2. Check if there are data holes.
+3. Check if the power curve over a day starts and ends by low power. (day starts and ends at night and during night the power generation is typically low)
+Afterwards the remaining days are compared with the template by Euclidian distance and correlation thresholds for similarity. If a day is similar (low distances and high correlation), the day is defined as clear sky day.
+
 ## Explanations:
 
 get_clearskydays(data, column_time: str = "time", column_power: str = "power", column_id = None, comparison_intervall: str = "30d", prep_smooth_kernal: int = None, smooth_kernal: int = None, percentil: float = 0.9, first_last_limit: float = 0.1, show_first_last_value: bool = True, min_number_of_datapoints: int = None, find_numberofpoints: bool = True, hole_size_threshold: int = 100, show_max_hole_size: bool = True, plot_raw_data: bool = True, corr_threshold: float = 0.98, plot_corr_results: bool = True, max_dist: int = 40, n_max_exceeds: int = 50, plot_taken_results: bool = True)
@@ -150,20 +162,7 @@ The next values that need to be adjusted are smoothing parameters prep_smooth_ke
 
 
 
-## Citation
-If you use the code in terms of a publication, I would be greatfull, if you could cite the following paper:  
-E. Wittmann, C. Buerhop-Lutz, S. Bennett, V. Christlein, J. Hauch, C. J. Brabec, I. M. Peters, „PV Polaris – Automated PV system Orientation Prediction”, IEEE Photonics Journal, vol. 17, no. 3, 2025. DOI: 10.1109/JPHOT.2025.3568887
 
------------------------------------------------------------------------------------------------
-
-
-## Functionality:
-First a clear sky template is created based on the work of Ian Marius et all. [1]. The process involves finding the maximum power output for each time of day over a one-month dataset, multiplying the result by a percentile (e.g., 0.9 for Germany), and smoothing it using median and mean sliding windows.
-The clear sky filter than filters out days, that show lagging data. To filter days with lagging data, there are three checks:
-1. Check if data over a day has enough datapoints. (e.g. within a recordingspeed of 1h, there should be 24 datapoints for a day)
-2. Check if there are data holes.
-3. Check if the power curve over a day starts and ends by low power. (day starts and ends at night and during night the power generation is typically low)
-Afterwards the remaining days are compared with the template by Euclidian distance and correlation thresholds for similarity. If a day is similar (low distances and high correlation), the day is defined as clear sky day.
 
 
 
