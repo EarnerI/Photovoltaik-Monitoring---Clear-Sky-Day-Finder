@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from importlib import resources
 
-def load_example():
+def load_example_data():
     with resources.files("clearskydayfinder.data").joinpath("Example_Data.csv").open("rb") as f:
         data = pl.read_csv(f)
         return data
