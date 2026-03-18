@@ -7,6 +7,10 @@ Usable for Module-, String- and Inverter data as well as for DC and AC power rec
 Figure 1: The Clear Sky filter takes several days of monitoring data and returns only days, classified as clear sky days.
 
 ------------------------------------------------------------------------------------------
+## Download via pip
+
+pip install "git+https://github.com/EarnerI/Photovoltaik-Monitoring---Clear-Sky-Day-Finder.git"
+
 ## Code Example
 from clearskydayfinder import get_clearskydays  
 import polars as pl  
