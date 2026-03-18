@@ -41,7 +41,7 @@ If there are several PV systems, there are two ways the systems are stored in a 
     has to be updated.
 2. there is one power column and an id column. In this case, put the name of the id column.
 (default: module_id)
------------------------------------------------------------------------------------------------------------------------------------------
+
 Clearsky-Template:
 Takes a dataframe of monitoring data, including power over time, over several days and creates a maximum value curve. (Clear sky template)
 Afterwards the daily curve is multiplied by a percentil, to correct the daily curve. The reason for correction is due to e.g. air polution.
@@ -51,7 +51,7 @@ Afterwards the daily curve is multiplied by a percentil, to correct the daily cu
 :param smooth_kernal: A sliding mean window, that can be used "after" the maximal values are determined for each time step.
                       -> smoothes the resulting maximal value curve.
 :param percentil: correction factor; (in Germany probably 0.9); (default: 0.9)
-------------------------------------------------------------------------------------------------------------------------------------------
+
 General Day filtering:
 :param min_number_of_datapoints: the minimal amount of datapoints ONE DAY has to include in order to be recognised as possible clear sky day.
                                  This value strongly depends on the recording frequence.
@@ -75,7 +75,7 @@ General Day filtering:
                             If set to None, a default value depending on the frequendy is used.
 :param show_max_hole_size: prints the maximal hole_size for each day.
 :param plot_raw_data: plots each day, that fullfills the checks given by the limits above.
--------------------------------------------------------------------------------------------------------------------------------------------------
+
 Correlation Comparison
 :param corr_threshold:  Each day is compared with the given template. Comparison is done by the correlation.
                         If the correlation is higher than corr_threshold, the day is accepted as possible clear sky day.
@@ -83,7 +83,7 @@ Correlation Comparison
                                       1: Only exactly correlating days will be accepted.
                         Good values are typically between 0.95 - 0.98 (good quantity to quality relation)
 :param plot_corr_results: plots all days, that exceed the correlation threshold.
------------------------------------------------------------------------------------------------------------------------------------------------
+
 Euclidian Distance Comparison
 :param max_dist: The maximal allowed power difference for a time step. If the Distance is exceeded for a time step, the step is counted.
                  This value depends on the P_MPP
@@ -92,7 +92,7 @@ Euclidian Distance Comparison
                       Default values are given depending on the frequency.
 
 :param plot_taken_results: Plots the the taken days counted as clear sky days.
------------------------------------------------------------------------------------------------------------------------------------------------
+
 :return: Returns a dataframe including only the filtered clear sky days, given as polars dataframe.
 
 ## Parameter Fitting:
